@@ -4,6 +4,30 @@ import Product, { IProduct } from "@/database/models/Product";
 // In Next 16, params is a Promise -> must be awaited.
 type Context = { params: Promise<{ id: string }> };
 
+// GET /api/products/:id -> a single product.
+export async function GET(_request: Request, { params }: Context) {
+  try {
+    await connectDB();
+    const { id } = await params;
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return Response.json(
+        { data: null, code: 404, message: "Producto no encontrado" },
+        { status: 404 }
+      );
+    }
+
+    return Response.json(
+      { data: product, code: 200, message: "Producto obtenido" },
+      { status: 200 }
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return Response.json({ data: null, code: 500, message }, { status: 500 });
+  }
+}
+
 // PUT /api/products/:id -> update a product.
 export async function PUT(request: Request, { params }: Context) {
   try {
