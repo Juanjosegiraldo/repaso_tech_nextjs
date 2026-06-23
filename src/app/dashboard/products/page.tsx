@@ -9,8 +9,10 @@ import {
   updateProduct,
   deleteProduct,
   Product,
+  ProductFilters,
 } from "@/services/productService";
 import { ProductCard } from "@/components/ProductCard";
+import Link from "next/link";
 
 // Empty form template.
 const EMPTY_FORM: Product = {
@@ -29,9 +31,10 @@ export default function ProductsPage() {
   const [form, setForm] = useState<Product>(EMPTY_FORM);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [filters, setFilters] = useState<ProductFilters>({});
 
-  const loadProducts = () => {
-    getProducts().then(setProducts).catch(() => setProducts([]));
+  const loadProducts = (applied: ProductFilters = {}) => {
+    getProducts(applied).then(setProducts).catch(() => setProducts([]));
   };
 
   // Session guard (any logged-in user), then initial load.
@@ -177,21 +180,64 @@ export default function ProductsPage() {
         </div>
       </form>
 
+      {/* Filters / search */}
+      <div className="flex flex-wrap items-center gap-2 rounded-lg border p-3">
+        <input
+          placeholder="Buscar por nombre"
+          value={filters.name ?? ""}
+          onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+          className="flex-1 rounded border p-2"
+        />
+        <input
+          placeholder="Categoría"
+          value={filters.category ?? ""}
+          onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+          className="flex-1 rounded border p-2"
+        />
+        <select
+          value={filters.available ?? ""}
+          onChange={(e) =>
+            setFilters({
+              ...filters,
+              available: e.target.value as ProductFilters["available"],
+            })
+          }
+          className="rounded border p-2"
+        >
+          <option value="">Todos</option>
+          <option value="true">En stock</option>
+          <option value="false">Agotados</option>
+        </select>
+        <button
+          onClick={() => loadProducts(filters)}
+          className="rounded bg-black px-4 py-2 text-white"
+        >
+          Filtrar
+        </button>
+      </div>
+
       {/* Product list */}
       {products.length === 0 ? (
         <p>No hay productos registrados. ¡Crea el primero!</p>
       ) : (
         <div className="space-y-3">
           {products.map((p) => (
-            <ProductCard
-              key={p._id}
-              name={p.name}
-              price={p.price}
-              stock={p.stock}
-              currency={p.currency}
-              onEdit={() => handleEdit(p)}
-              onDelete={() => handleDelete(p._id ?? "")}
-            />
+            <div key={p._id} className="space-y-1">
+              <ProductCard
+                name={p.name}
+                price={p.price}
+                stock={p.stock}
+                currency={p.currency}
+                onEdit={() => handleEdit(p)}
+                onDelete={() => handleDelete(p._id ?? "")}
+              />
+              <Link
+                href={`/products/${p._id}`}
+                className="ml-1 text-sm text-blue-600 underline"
+              >
+                Ver detalle
+              </Link>
+            </div>
           ))}
         </div>
       )}

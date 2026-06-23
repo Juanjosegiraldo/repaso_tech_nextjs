@@ -1,11 +1,26 @@
+import type { QueryFilter } from "mongoose";
 import connectDB from "@/lib/database";
 import Product, { IProduct } from "@/database/models/Product";
 
-// GET /api/products -> list all products.
-export async function GET() {
+// GET /api/products -> list products, optionally filtered by
+// ?name=...&category=...&available=true|false
+export async function GET(request: Request) {
   try {
     await connectDB();
-    const products = await Product.find({});
+
+    const { searchParams } = new URL(request.url);
+    const name = searchParams.get("name");
+    const category = searchParams.get("category");
+    const available = searchParams.get("available");
+
+    // Typed filter (no `any`).
+    const filter: QueryFilter<IProduct> = {};
+    if (name) filter.name = { $regex: name, $options: "i" }; // partial, case-insensitive
+    if (category) filter.category = { $regex: category, $options: "i" };
+    if (available === "true") filter.stock = { $gt: 0 }; // in stock
+    else if (available === "false") filter.stock = { $lte: 0 }; // out of stock
+
+    const products = await Product.find(filter);
     return Response.json(
       { data: products, code: 200, message: "Productos obtenidos" },
       { status: 200 }
