@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TechNova
 
-## Getting Started
+CRUD application built with **Next.js 16 (App Router)**, **TypeScript**, **Mongoose** and
+**MongoDB Atlas**. It manages two modules — **Users** and **Products** — with basic
+authentication and client-side route protection.
 
-First, run the development server:
+## Features
+
+- Users CRUD (`/admin/users`, admin only) with hashed passwords (bcrypt).
+- Products CRUD (`/dashboard/products`) with SKU uniqueness and price/stock validation.
+- Basic auth (login) + session stored in `localStorage` and route guards.
+- Service layer in `src/services` — views never call `fetch` directly.
+- Standard API envelope: `{ data, code, message }` with correct HTTP status codes.
+- Optional: welcome email on sign-up, product filters, product detail with comments.
+
+## Requirements
+
+- **Node.js 18+**
+- A **MongoDB Atlas** account (free M0 cluster is enough)
+
+## Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Juanjosegiraldo/repaso_tech_nextjs.git
+cd technova
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file in the project root (see `.env.example`):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+# MongoDB connection string (standard format works even if SRV DNS is blocked)
+MONGODB_URI=mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/technova?retryWrites=true&w=majority
 
-## Learn More
+# Email (only needed for the welcome-email feature)
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-gmail-app-password
+```
 
-To learn more about Next.js, take a look at the following resources:
+> `.env.local` is git-ignored and must never be committed.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Run
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run dev      # http://localhost:3000
+npm run build    # production build
+npm start        # run the production build
+```
 
-## Deploy on Vercel
+Quick connection check: open `http://localhost:3000/api/health` → it should return
+`{ "code": 200, "message": "DB Online" }`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment (Vercel)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push this repo to GitHub.
+2. On [vercel.com](https://vercel.com) → **Add New → Project** → import the repo.
+3. In **Settings → Environment Variables**, add `MONGODB_URI` (and `EMAIL_USER`,
+   `EMAIL_PASS` if you use email). `.env.local` is **not** uploaded, so you must set
+   them again here.
+4. **Deploy**.
+
+> ⚠️ In MongoDB Atlas → **Network Access**, add `0.0.0.0/0` (Allow access from
+> anywhere). Without it, Vercel's servers cannot reach your cluster.
+
+## Author
+
+- **Nombre:** <!-- TODO: tu nombre completo -->
+- **Clan:** <!-- TODO: tu clan -->
+- **Correo:** <!-- TODO: tu correo -->
+- **Documento de identidad:** <!-- TODO: tu documento -->
