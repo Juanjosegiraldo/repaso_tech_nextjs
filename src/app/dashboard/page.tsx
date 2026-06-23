@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSession, clearSession, SessionUser } from "@/services/authService";
+import { getSession, SessionUser } from "@/services/authService";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -20,33 +20,20 @@ export default function DashboardPage() {
     setUser(session);
   }, [router]);
 
-  const handleLogout = () => {
-    clearSession();
-    router.push("/login");
-  };
-
   // While the guard decides, render nothing to avoid a flash of content.
   if (!user) return null;
 
+  // Navigation (logout / sections) now lives in the shared Navbar.
   return (
     <main className="mx-auto max-w-2xl space-y-4 p-6">
       <h1 className="text-2xl font-bold">Dashboard</h1>
       <p>
         Bienvenido, <strong>{user.nombre}</strong> ({user.role})
       </p>
-
-      {user.role === "admin" && (
-        <a href="/admin/users" className="text-blue-600 underline">
-          Ir a administración de usuarios
-        </a>
-      )}
-
-      <button
-        onClick={handleLogout}
-        className="block rounded bg-red-600 px-4 py-2 text-white"
-      >
-        Cerrar sesión
-      </button>
+      <p className="text-gray-600">
+        Usa la barra superior para navegar entre Productos
+        {user.role === "admin" ? ", Usuarios" : ""} o cerrar sesión.
+      </p>
     </main>
   );
 }

@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-// App Router uses next/navigation, NEVER next/router (that is Pages Router).
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { login, saveSession } from "@/services/authService";
+import { createUser } from "@/services/userService";
 
-export default function LoginPage() {
+// Public sign-up page. Creates a user with the default "user" role.
+export default function RegisterPage() {
   const router = useRouter();
+  const [nombre, setNombre] = useState("");
+  const [cc, setCc] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,9 +20,8 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const session = await login({ email, password });
-      saveSession(session); // persist session in localStorage
-      router.push("/dashboard"); // client-side navigation
+      await createUser({ nombre, cc, email, password, role: "user" });
+      router.push("/login"); // after registering, go log in
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error inesperado");
     } finally {
@@ -34,10 +35,24 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm space-y-4 rounded-lg border p-6 shadow"
       >
-        <h1 className="text-2xl font-bold">Iniciar sesión</h1>
+        <h1 className="text-2xl font-bold">Crear cuenta</h1>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
+        <input
+          placeholder="Nombre"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
+          className="w-full rounded border p-2"
+        />
+        <input
+          placeholder="Cédula"
+          value={cc}
+          onChange={(e) => setCc(e.target.value)}
+          required
+          className="w-full rounded border p-2"
+        />
         <input
           type="email"
           placeholder="Email"
@@ -60,13 +75,13 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full rounded bg-black p-2 text-white disabled:opacity-50"
         >
-          {loading ? "Entrando..." : "Entrar"}
+          {loading ? "Creando..." : "Registrarse"}
         </button>
 
         <p className="text-center text-sm text-gray-600">
-          ¿No tienes cuenta?{" "}
-          <Link href="/register" className="text-blue-600 underline">
-            Regístrate
+          ¿Ya tienes cuenta?{" "}
+          <Link href="/login" className="text-blue-600 underline">
+            Inicia sesión
           </Link>
         </p>
       </form>
