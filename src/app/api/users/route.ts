@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import connectDB from "@/lib/database";
 import User, { IUser } from "@/database/models/User";
+import { sendWelcomeEmail } from "@/lib/mail";
 
 // GET /api/users -> list all users WITHOUT their password.
 export async function GET() {
@@ -55,7 +56,16 @@ export async function POST(request: Request) {
       role: role === "admin" ? "admin" : "user",
     });
 
-    // 4) Re-read without the password to return a safe payload.
+    // 4) Send a welcome email, but never let it block user creation.
+    try {
+      await sendWelcomeEmail(nombre, email);
+    } catch (mailError) {
+      const detail =
+        mailError instanceof Error ? mailError.message : String(mailError);
+      console.error("Welcome email failed:", detail);
+    }
+
+    // 5) Re-read without the password to return a safe payload.
     const created = await User.findById(newUser._id).select("-password");
 
     return Response.json(
