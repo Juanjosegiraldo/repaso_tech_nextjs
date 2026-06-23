@@ -66,7 +66,7 @@ Quick connection check: open `http://localhost:3000/api/health` → it should re
 
 ## Author
 
-- **Nombre:** <!-- TODO: tu nombre completo -->
-- **Clan:** <!-- TODO: tu clan -->
-- **Correo:** <!-- TODO: tu correo -->
-- **Documento de identidad:** <!-- TODO: tu documento -->
+- **Nombre:** Juan Jose Giraldo Muñoz
+- **Clan:** Thompson
+- **Correo:** juan.jo15@hotmail.com
+- **Documento de identidad:** 1037662885
